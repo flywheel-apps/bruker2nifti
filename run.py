@@ -52,7 +52,7 @@ def write_out_metadata(vis_par_file, niftis, metadata_filepath, job_config):
         job_config['destination']['type']: {
             'files': [
                 {
-                    'name': os.path.basename(n),
+                    'name': n,
                     'type': 'nifti',
                     'info': info_metadata,
                     'modality': 'MR'
@@ -65,7 +65,7 @@ def write_out_metadata(vis_par_file, niftis, metadata_filepath, job_config):
         json.dump(metadata, fp, default=array_to_list)
 
 
-def process_and_clean_output(output_folder, job_config):
+def process_and_clean_output(output_folder, job_config, input_filename):
     vis_par_file = None
     niftis = []
     nifti_regex = re.compile('^.*\.nii(\.gz)?$')
@@ -77,11 +77,12 @@ def process_and_clean_output(output_folder, job_config):
                 vis_par_file = os.path.join(root, f)
     scan_dir = os.path.dirname(vis_par_file)
     study_dir = os.path.dirname(scan_dir)
+    new_nifti_names = ['{}{}'.format(input_filename.split('.')[0], os.path.basename(n)[len(os.path.basename(scan_dir)):]) for n in niftis]
 
-    for nifti in niftis:
-        shutil.move(nifti, os.path.join(output_folder, os.path.basename(nifti)))
+    for i, nifti in enumerate(niftis):
+        shutil.move(nifti, os.path.join(output_folder, new_nifti_names[i]))
 
-    write_out_metadata(vis_par_file, niftis, os.path.join(output_folder, '.metadata.json'), job_config)
+    write_out_metadata(vis_par_file, new_nifti_names, os.path.join(output_folder, '.metadata.json'), job_config)
     shutil.rmtree(study_dir)
 
 
@@ -118,4 +119,4 @@ if __name__ == '__main__':
     bru.convert()
 
     print('Processing Outputs...')
-    process_and_clean_output(output_folder, job_config)
+    process_and_clean_output(output_folder, job_config, input_filename)
