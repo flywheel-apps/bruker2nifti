@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import zipfile
 import re
@@ -10,12 +11,11 @@ from bruker2nifti.converter import Bruker2Nifti
 def unzip_file(input_filepath):
     input_folder = os.path.join(os.path.dirname(input_filepath), '1')
     os.mkdir(input_folder)
-    with open(input_filepath, 'r') as fp:
-        zip = zipfile.ZipFile(fp)
-        zip.extractall(input_folder)
-        zip.close()
+    with zipfile.ZipFile(input_filepath) as zf:
+        zf.extractall(input_folder)
+        zf.close()
 
-    print os.listdir(input_folder)
+    print(os.listdir(input_folder))
     if len(os.listdir(input_folder)) != 1:
         input_folder = os.path.dirname(input_folder)
     return input_folder
@@ -68,7 +68,7 @@ def write_out_metadata(vis_par_file, niftis, metadata_filepath, job_config):
 def process_and_clean_output(output_folder, job_config, input_filename):
     vis_par_file = None
     niftis = []
-    nifti_regex = re.compile('^.*\.nii(\.gz)?$')
+    nifti_regex = re.compile(r'^.*\.nii(\.gz)?$')
     for root, dirs, files, in os.walk(output_folder):
         for f in files:
             if nifti_regex.match(f):
@@ -96,12 +96,12 @@ if __name__ == '__main__':
     # Grab the file paths
     input_filename = os.listdir(input_folder)[0]
     input_filepath = os.path.join(input_folder, input_filename)
-    print input_filename
+    print(input_filename)
 
     # Extract the zip if it is a zip
     if input_filename.endswith('.zip'):
         input_folder = unzip_file(input_filepath)
-    print input_folder
+    print(input_folder)
 
     with open(CONFIG_PATH) as config_file:
         job_config = json.load(config_file)
