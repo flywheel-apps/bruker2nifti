@@ -13,7 +13,6 @@ def unzip_file(input_filepath):
     os.mkdir(input_folder)
     with zipfile.ZipFile(input_filepath) as zf:
         zf.extractall(input_folder)
-        zf.close()
 
     print(os.listdir(input_folder))
     if len(os.listdir(input_folder)) != 1:
