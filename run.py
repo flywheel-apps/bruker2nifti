@@ -47,7 +47,7 @@ def write_out_metadata(vis_par_file, niftis, metadata_filepath, job_config):
             return array.tolist()
         raise TypeError('Not serializable')
 
-    info_metadata = np.asscalar(np.load(vis_par_file))
+    info_metadata = np.asscalar(np.load(vis_par_file, allow_pickle=True))
     metadata = {
         job_config['destination']['type']: {
             'files': [
